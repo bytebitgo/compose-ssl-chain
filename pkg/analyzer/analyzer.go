@@ -113,11 +113,18 @@ func isChainComplete(certs []*x509.Certificate) bool {
 		}
 	}
 
-	// 检查最后一个证书是否是自签名的（根证书）
+	// 证书链完整的条件：
+	// 1. 最后一个证书是根证书（自签名）
+	// 2. 或者最后一个证书是可信的中间证书
 	lastCert := certs[len(certs)-1]
-	if lastCert.Issuer.String() == lastCert.Subject.String() {
-		err := lastCert.CheckSignature(lastCert.SignatureAlgorithm, lastCert.RawTBSCertificate, lastCert.Signature)
-		return err == nil
+	if lastCert.IsCA {
+		if lastCert.Issuer.String() == lastCert.Subject.String() {
+			// 自签名根证书
+			err := lastCert.CheckSignature(lastCert.SignatureAlgorithm, lastCert.RawTBSCertificate, lastCert.Signature)
+			return err == nil
+		}
+		// 可信的中间证书也是可以的
+		return true
 	}
 
 	return false
