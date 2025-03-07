@@ -1,0 +1,39 @@
+name: 构建和测试
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: 构建和测试
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 设置Go环境
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: 获取依赖
+        run: go mod download
+
+      - name: 运行测试
+        run: go test -v ./...
+
+      - name: 构建应用
+        run: go build -v -o ssl-chain-analyzer ./cmd
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: ssl-chain-analyzer
+          path: ssl-chain-analyzer
+          retention-days: 5 

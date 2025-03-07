@@ -1,0 +1,28 @@
+name: "ssl-chain-analyzer"
+arch: "amd64"
+platform: "linux"
+version: "1.0.3"
+section: "default"
+priority: "extra"
+maintainer: "维护者 <maintainer@example.com>"
+description: |
+  SSL/TLS证书链分析工具，支持RSA和ECC双证书分析。
+  可以下载和分析证书链的完整性和可信性。
+vendor: "compose-ssl-chain"
+homepage: "https://github.com/compose-ssl-chain"
+license: "MIT"
+contents:
+  - src: ./ssl-chain-analyzer
+    dst: /usr/bin/ssl-chain-analyzer
+  - src: ./README.md
+    dst: /usr/share/doc/ssl-chain-analyzer/README.md
+  - src: ./CHANGELOG.md
+    dst: /usr/share/doc/ssl-chain-analyzer/CHANGELOG.md
+
+overrides:
+  rpm:
+    scripts:
+      postinstall: ./scripts/postinstall.sh
+  deb:
+    scripts:
+      postinstall: ./scripts/postinstall.sh 
