@@ -1,4 +1,4 @@
-VERSION := 1.0.5
+VERSION := 1.0.6
 BINARY := ssl-chain-analyzer
 PLATFORMS := linux darwin
 ARCHITECTURES := amd64 arm64
