@@ -9,6 +9,7 @@
 ## 功能特点
 
 - 支持下载RSA和ECC双证书及其证书链
+- 支持读取本地PEM/CRT证书文件并分析证书链
 - 分析证书链的完整性和可信性
 - 检测证书是否过期
 - 检测证书链是否包含吊销信息
@@ -98,6 +99,8 @@ git push origin v1.0.3
 
 ## 使用方法
 
+### 分析在线域名
+
 ```bash
 # 基本用法
 ./ssl-chain-analyzer -domain example.com
@@ -115,10 +118,28 @@ git push origin v1.0.3
 ./ssl-chain-analyzer -domain example.com -verbose
 ```
 
+### 分析本地证书文件
+
+```bash
+# 分析单个证书文件
+./ssl-chain-analyzer -cert ./cert.pem
+
+# 分析证书文件并导出证书链
+./ssl-chain-analyzer -cert ./cert.pem -export
+
+# 分析证书目录
+./ssl-chain-analyzer -cert-dir ./certs
+
+# 显示详细信息
+./ssl-chain-analyzer -cert ./cert.pem -verbose
+```
+
 ## 命令行参数
 
-- `-domain`: 要分析的域名（必需）
+- `-domain`: 要分析的域名
 - `-port`: HTTPS端口（默认：443）
+- `-cert`: 本地证书文件路径
+- `-cert-dir`: 本地证书目录路径
 - `-output`: 证书输出目录（默认：certificates）
 - `-export`: 是否导出证书（默认：false）
 - `-verbose`: 是否显示详细信息（默认：false）
@@ -143,6 +164,11 @@ git push origin v1.0.3
 ```
 
 ## 版本历史
+
+### v1.0.4 (2024-03-07)
+- 添加了读取本地PEM/CRT证书文件的功能
+- 支持从单个文件或目录构建证书链
+- 重构了证书导出功能
 
 ### v1.0.3 (2024-03-07)
 - 添加了GitHub Actions CI/CD工作流

@@ -1,4 +1,4 @@
-VERSION := 1.0.3
+VERSION := 1.0.5
 BINARY := ssl-chain-analyzer
 PLATFORMS := linux darwin
 ARCHITECTURES := amd64 arm64
@@ -24,6 +24,7 @@ clean:
 	rm -f $(BINARY)
 	rm -f $(BINARY)_*
 	rm -f *.deb *.rpm
+	rm -rf certificates/
 
 # 安装nFPM
 install-nfpm:
@@ -31,8 +32,8 @@ install-nfpm:
 
 # 打包
 package: build install-nfpm
-	nfpm package --target ./ --packager deb
-	nfpm package --target ./ --packager rpm
+	nfpm package -p deb -t ./dist
+	nfpm package -p rpm -t ./dist
 
 # 交叉编译并打包
 package-all: cross-build install-nfpm
