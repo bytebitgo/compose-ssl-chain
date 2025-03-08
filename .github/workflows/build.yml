@@ -46,7 +46,8 @@ jobs:
         run: |
           mkdir -p build
           cp ssl-chain-analyzer build/
-          cp -r assets build/
+          mkdir -p build/assets
+          cp -r assets/web build/assets/
           chmod +x packaging/scripts/*.sh
           nfpm package --config packaging/nfpm.yaml --target build --packager deb
           nfpm package --config packaging/nfpm.yaml --target build --packager rpm

@@ -5,6 +5,18 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.0.8] - 2025-03-08
+
+### 新增
+- 添加 GitHub Actions 自动化构建和发布流程
+- 添加 DEB 和 RPM 包的自动构建
+- 添加自动更新 CHANGELOG 功能
+
+### 优化
+- 优化打包流程，修复目录结构问题
+- 改进构建脚本的执行权限管理
+- 优化 systemd 服务配置
+
 ## [1.0.7] - 2025-03-08
 
 ### 修复

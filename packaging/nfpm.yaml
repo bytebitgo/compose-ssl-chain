@@ -1,7 +1,7 @@
 name: ssl-chain-analyzer
 arch: amd64
 platform: linux
-version: v1.0.7
+version: v1.0.8
 release: 1
 section: utils
 priority: optional
@@ -32,14 +32,6 @@ contents:
 
   - src: ./build/assets/web
     dst: /usr/share/ssl-chain-analyzer/web
-    type: tree
-    file_info:
-      mode: 0644
-      owner: root
-      group: root
-
-  - src: ./build/assets/web/assets
-    dst: /usr/share/ssl-chain-analyzer/web/assets
     type: tree
     file_info:
       mode: 0644
