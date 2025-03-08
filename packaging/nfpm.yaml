@@ -1,0 +1,71 @@
+name: ssl-chain-analyzer
+arch: amd64
+platform: linux
+version: v1.0.7
+release: 1
+section: utils
+priority: optional
+maintainer: SSL Chain Analyzer Team <support@example.com>
+description: |
+  SSL Chain Analyzer 是一个用于下载和分析SSL/TLS证书链的工具，
+  支持RSA和ECC双证书分析。它可以分析证书链的完整性和可信性，
+  检测证书是否过期，以及检查证书链是否包含吊销信息。
+
+vendor: SSL Chain Analyzer
+homepage: https://github.com/compose-ssl-chain/ssl-chain-analyzer
+license: MIT
+
+contents:
+  - src: ./build/ssl-chain-analyzer
+    dst: /usr/bin/ssl-chain-analyzer
+    file_info:
+      mode: 0755
+      owner: root
+      group: root
+
+  - src: ./packaging/systemd/ssl-chain-analyzer.service
+    dst: /lib/systemd/system/ssl-chain-analyzer.service
+    file_info:
+      mode: 0644
+      owner: root
+      group: root
+
+  - src: ./build/assets/web
+    dst: /usr/share/ssl-chain-analyzer/web
+    type: tree
+    file_info:
+      mode: 0644
+      owner: root
+      group: root
+
+  - src: ./build/assets/web/assets
+    dst: /usr/share/ssl-chain-analyzer/web/assets
+    type: tree
+    file_info:
+      mode: 0644
+      owner: root
+      group: root
+
+scripts:
+  preinstall: ./packaging/scripts/preinstall.sh
+  postinstall: ./packaging/scripts/postinstall.sh
+  preremove: ./packaging/scripts/preremove.sh
+  postremove: ./packaging/scripts/postremove.sh
+
+overrides:
+  rpm:
+    scripts:
+      preinstall: ./packaging/scripts/preinstall.sh
+      postinstall: ./packaging/scripts/postinstall.sh
+      preremove: ./packaging/scripts/preremove.sh
+      postremove: ./packaging/scripts/postremove.sh
+    depends:
+      - systemd
+  deb:
+    scripts:
+      preinstall: ./packaging/scripts/preinstall.sh
+      postinstall: ./packaging/scripts/postinstall.sh
+      preremove: ./packaging/scripts/preremove.sh
+      postremove: ./packaging/scripts/postremove.sh
+    depends:
+      - systemd 

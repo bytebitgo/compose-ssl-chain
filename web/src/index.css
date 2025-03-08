@@ -1,0 +1,196 @@
+@import 'antd/dist/reset.css';
+
+:root {
+  --primary-color: #1890ff;
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #f5222d;
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+.ant-layout-header {
+  background: var(--primary-color);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.ant-tabs-nav {
+  margin-bottom: 24px !important;
+}
+
+.ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.ant-upload-list {
+  margin-top: 16px;
+}
+
+.ant-descriptions {
+  background: #fff;
+}
+
+.ant-descriptions-row > th,
+.ant-descriptions-row > td {
+  padding: 12px 24px;
+}
+
+.ant-tag {
+  margin: 0;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.ant-space {
+  width: 100%;
+}
+
+.certificate-card {
+  margin-top: 16px;
+}
+
+.certificate-card:first-child {
+  margin-top: 0;
+}
+
+.ant-alert {
+  margin-bottom: 24px;
+}
+
+.ant-btn {
+  border-radius: 6px;
+  height: 40px;
+  padding: 6.4px 16px;
+  font-size: 16px;
+}
+
+.ant-input {
+  border-radius: 6px;
+  height: 40px;
+}
+
+.ant-input-affix-wrapper {
+  border-radius: 6px;
+  height: 40px;
+  padding: 0 11px;
+}
+
+.ant-input-prefix {
+  margin-right: 8px;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.text-white {
+  color: white;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}

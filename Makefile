@@ -1,79 +1,48 @@
-VERSION := 1.0.6
-BINARY := ssl-chain-analyzer
-PLATFORMS := linux darwin
-ARCHITECTURES := amd64 arm64
+.PHONY: all build clean package
 
-.PHONY: all build clean package package-macos
+VERSION := 1.0.7
+BINARY_NAME := ssl-chain-analyzer
+BUILD_DIR := build
 
 all: build
 
 build:
-	go build -o $(BINARY) ./cmd
+	@echo "执行构建脚本..."
+	./build.sh
 
-# 交叉编译
-cross-build:
-	@for platform in $(PLATFORMS); do \
-		for arch in $(ARCHITECTURES); do \
-			echo "Building for $$platform/$$arch..."; \
-			GOOS=$$platform GOARCH=$$arch go build -o $(BINARY)_$${platform}_$${arch} ./cmd; \
-		done; \
-	done
-
-# 清理
 clean:
-	rm -f $(BINARY)
-	rm -f $(BINARY)_*
-	rm -f *.deb *.rpm *.dmg
+	@echo "清理构建目录..."
+	rm -rf $(BUILD_DIR)
+	rm -rf assets/web
+	rm -rf *.deb *.rpm
+	rm -f ssl-chain-analyzer
 	rm -rf certificates/
-	rm -rf dist/
 
-# 安装nFPM
-install-nfpm:
-	go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+package: build
+	@echo "创建打包目录..."
+	mkdir -p $(BUILD_DIR)
+	@echo "复制构建文件..."
+	cp ssl-chain-analyzer $(BUILD_DIR)/
+	cp -r assets $(BUILD_DIR)/
+	chmod +x packaging/scripts/*.sh
+	
+	@echo "构建 DEB 包..."
+	nfpm package \
+		--config packaging/nfpm.yaml \
+		--target $(BUILD_DIR) \
+		--packager deb
+	
+	@echo "构建 RPM 包..."
+	nfpm package \
+		--config packaging/nfpm.yaml \
+		--target $(BUILD_DIR) \
+		--packager rpm
 
-# 安装gon (macOS签名和打包工具)
-install-gon:
-	go install github.com/mitchellh/gon/cmd/gon@latest
-
-# 打包
-package: build install-nfpm
-	mkdir -p dist
-	nfpm package -p deb -t ./dist
-	nfpm package -p rpm -t ./dist
-
-# macOS打包
-package-macos: build install-gon
-	mkdir -p dist
-	# 为 amd64 构建
-	GOOS=darwin GOARCH=amd64 go build -o ./dist/$(BINARY)_darwin_amd64 ./cmd
-	# 为 arm64 构建
-	GOOS=darwin GOARCH=arm64 go build -o ./dist/$(BINARY)_darwin_arm64 ./cmd
-	# 创建通用二进制
-	lipo -create ./dist/$(BINARY)_darwin_amd64 ./dist/$(BINARY)_darwin_arm64 -output ./dist/$(BINARY)
-	# 使用 create-dmg 创建 DMG
-	create-dmg \
-		--volname "$(BINARY) Installer" \
-		--volicon "assets/icon.icns" \
-		--window-pos 200 120 \
-		--window-size 800 400 \
-		--icon-size 100 \
-		--icon "$(BINARY)" 200 190 \
-		--hide-extension "$(BINARY)" \
-		--app-drop-link 600 185 \
-		"./dist/$(BINARY)-$(VERSION).dmg" \
-		"./dist/$(BINARY)"
-
-# 交叉编译并打包所有平台
-package-all: cross-build install-nfpm install-gon
-	mkdir -p dist
-	BINARY=$(BINARY)_linux_amd64 nfpm package -p deb -t ./dist
-	BINARY=$(BINARY)_linux_amd64 nfpm package -p rpm -t ./dist
-	$(MAKE) package-macos
-
-# 测试
-test:
-	go test -v ./...
-
-# 运行
-run:
-	go run ./cmd/main.go 
+.PHONY: install
+install:
+	install -d $(DESTDIR)/usr/bin
+	install -m 755 $(BUILD_DIR)/$(BINARY_NAME) $(DESTDIR)/usr/bin/
+	install -d $(DESTDIR)/lib/systemd/system
+	install -m 644 packaging/systemd/ssl-chain-analyzer.service $(DESTDIR)/lib/systemd/system/
+	install -d $(DESTDIR)/usr/share/ssl-chain-analyzer
+	cp -r $(BUILD_DIR)/assets/web $(DESTDIR)/usr/share/ssl-chain-analyzer/ 

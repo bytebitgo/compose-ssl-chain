@@ -1,0 +1,26 @@
+[Unit]
+Description=SSL Chain Analyzer Service
+After=network.target
+Documentation=https://github.com/compose-ssl-chain/ssl-chain-analyzer
+
+[Service]
+Type=simple
+User=ssl-chain
+Group=ssl-chain
+ExecStart=/usr/bin/ssl-chain-analyzer --port 8081
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# 安全设置
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+SecureBits=no-setuid-fixup-locked
+
+[Install]
+WantedBy=multi-user.target 

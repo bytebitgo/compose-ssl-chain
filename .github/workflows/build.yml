@@ -8,32 +8,55 @@ on:
 
 jobs:
   build:
-    name: 构建和测试
     runs-on: ubuntu-latest
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: 设置Go环境
+      - name: 设置 Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
           cache: true
 
-      - name: 获取依赖
-        run: go mod download
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'web/package-lock.json'
+
+      - name: 安装系统依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
+
+      - name: 安装 nFPM
+        run: go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+
+      - name: 构建项目
+        run: |
+          chmod +x build.sh
+          ./build.sh
 
       - name: 运行测试
         run: go test -v ./...
 
-      - name: 构建应用
-        run: go build -v -o ssl-chain-analyzer ./cmd
+      - name: 构建包
+        run: |
+          mkdir -p build
+          cp ssl-chain-analyzer build/
+          cp -r assets build/
+          chmod +x packaging/scripts/*.sh
+          nfpm package --config packaging/nfpm.yaml --target build --packager deb
+          nfpm package --config packaging/nfpm.yaml --target build --packager rpm
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
-          name: ssl-chain-analyzer
-          path: ssl-chain-analyzer
+          name: packages
+          path: |
+            build/*.deb
+            build/*.rpm
+            ssl-chain-analyzer
           retention-days: 5 

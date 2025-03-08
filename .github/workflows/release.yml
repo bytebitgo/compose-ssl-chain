@@ -1,4 +1,4 @@
-name: 发布
+name: 构建和发布
 
 on:
   push:
@@ -10,31 +10,80 @@ permissions:
   packages: write
 
 jobs:
-  goreleaser:
-    name: 发布
+  build-and-release:
     runs-on: ubuntu-latest
+    
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 设置Go环境
+      - name: 设置 Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
           cache: true
+      
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'web/package-lock.json'
 
-      - name: 安装依赖
+      - name: 安装系统依赖
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm
 
-      - name: 运行GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+      - name: 安装 nFPM
+        run: go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+
+      - name: 获取版本号
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: 构建项目
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: 创建打包目录
+        run: |
+          mkdir -p build
+          cp ssl-chain-analyzer build/
+          cp -r assets build/
+
+      - name: 打包 DEB 和 RPM
+        run: |
+          chmod +x packaging/scripts/*.sh
+          nfpm package --config packaging/nfpm.yaml --target build --packager deb
+          nfpm package --config packaging/nfpm.yaml --target build --packager rpm
+
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v1
         with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            build/*.deb
+            build/*.rpm
+            ssl-chain-analyzer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 更新 CHANGELOG
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ steps.get_version.outputs.VERSION }}
+          release-notes: ${{ github.event.release.body }}
+
+      - name: 提交 CHANGELOG
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: "docs: 更新 CHANGELOG"
+          file_pattern: CHANGELOG.md
