@@ -11,26 +11,25 @@ permissions:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
-    container:
-      image: centos:7
+    runs-on: ubuntu-20.04
     
     steps:
       - name: 安装基础工具
         run: |
-          yum install -y git make gcc rpm-build wget curl tar gzip
+          sudo apt-get update
+          sudo apt-get install -y build-essential rpm curl wget git
 
       - name: 安装 Go
         run: |
           curl -L https://go.dev/dl/go1.21.6.linux-amd64.tar.gz -o go.tar.gz
-          tar -C /usr/local -xzf go.tar.gz
+          sudo tar -C /usr/local -xzf go.tar.gz
           export PATH=$PATH:/usr/local/go/bin
           go version
 
       - name: 安装 Node.js
-        run: |
-          curl -sL https://rpm.nodesource.com/setup_20.x | bash -
-          yum install -y nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: 检出代码
         uses: actions/checkout@v4
@@ -54,18 +53,14 @@ jobs:
           echo "NOTES<<EOF" >> $GITHUB_OUTPUT
           echo "## 新版本发布 ${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          echo "### 新增" >> $GITHUB_OUTPUT
-          echo "- 添加对 CentOS 7/8/9 的 RPM 包支持" >> $GITHUB_OUTPUT
-          echo "- 添加静态链接构建支持" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
           echo "### 优化" >> $GITHUB_OUTPUT
-          echo "- 优化构建环境，使用 CentOS 7 作为基础环境" >> $GITHUB_OUTPUT
-          echo "- 改进 RPM 包的兼容性" >> $GITHUB_OUTPUT
-          echo "- 优化二进制文件的系统兼容性" >> $GITHUB_OUTPUT
+          echo "- 优化构建环境，使用 Ubuntu 20.04 LTS 作为基础环境" >> $GITHUB_OUTPUT
+          echo "- 改进构建流程，简化依赖安装" >> $GITHUB_OUTPUT
+          echo "- 优化包构建配置" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "### 修复" >> $GITHUB_OUTPUT
-          echo "- 修复 GLIBC 版本兼容性问题" >> $GITHUB_OUTPUT
-          echo "- 修复在较旧系统上的运行问题" >> $GITHUB_OUTPUT
+          echo "- 修复构建环境依赖问题" >> $GITHUB_OUTPUT
+          echo "- 改进系统兼容性" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: 构建项目
@@ -74,7 +69,6 @@ jobs:
           export CGO_ENABLED=0
           export GOOS=linux
           export GOARCH=amd64
-          export GOFLAGS="-buildmode=pie"
           chmod +x build.sh
           ./build.sh
 
@@ -86,20 +80,10 @@ jobs:
           cp -r assets/web build/assets/
           chmod +x packaging/scripts/*.sh
 
-      - name: 打包 CentOS 7 RPM
+      - name: 打包 RPM
         run: |
           export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin
-          nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos7
-
-      - name: 打包 CentOS 8 RPM
-        run: |
-          export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin
-          nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos8
-
-      - name: 打包 CentOS 9 RPM
-        run: |
-          export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin
-          nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos9
+          nfpm package --config packaging/nfpm.yaml --target build --packager rpm
 
       - name: 打包 DEB
         run: |
