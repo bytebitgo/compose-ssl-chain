@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ssl-web
 
       - name: 设置 Go
         uses: actions/setup-go@v4
@@ -93,6 +94,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 配置 Git
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
       - name: 更新 CHANGELOG
         uses: stefanzweifel/changelog-updater-action@v1
         with:
@@ -102,6 +108,7 @@ jobs:
       - name: 提交 CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          branch: main
+          branch: ssl-web
           commit_message: "docs: 更新 CHANGELOG"
           file_pattern: CHANGELOG.md
+          repository: .
