@@ -56,14 +56,17 @@ jobs:
           echo "## 新版本发布 ${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "### 新增" >> $GITHUB_OUTPUT
-          echo "- 添加 GitHub Actions 自动化构建和发布流程" >> $GITHUB_OUTPUT
-          echo "- 添加 DEB 和 RPM 包的自动构建" >> $GITHUB_OUTPUT
-          echo "- 添加自动更新 CHANGELOG 功能" >> $GITHUB_OUTPUT
+          echo "- 添加对 CentOS 7/8/9 的 RPM 包支持" >> $GITHUB_OUTPUT
+          echo "- 添加静态链接构建支持" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "### 优化" >> $GITHUB_OUTPUT
-          echo "- 优化打包流程，修复目录结构问题" >> $GITHUB_OUTPUT
-          echo "- 改进构建脚本的执行权限管理" >> $GITHUB_OUTPUT
-          echo "- 优化 systemd 服务配置" >> $GITHUB_OUTPUT
+          echo "- 优化构建环境，使用 CentOS 7 作为基础环境" >> $GITHUB_OUTPUT
+          echo "- 改进 RPM 包的兼容性" >> $GITHUB_OUTPUT
+          echo "- 优化二进制文件的系统兼容性" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 修复" >> $GITHUB_OUTPUT
+          echo "- 修复 GLIBC 版本兼容性问题" >> $GITHUB_OUTPUT
+          echo "- 修复在较旧系统上的运行问题" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: 构建项目

@@ -1,7 +1,7 @@
 name: ssl-chain-analyzer
 arch: amd64
 platform: linux
-version: v1.0.8
+version: v1.0.9
 release: 1
 section: utils
 priority: optional
