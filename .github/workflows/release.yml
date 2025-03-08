@@ -76,8 +76,8 @@ jobs:
         run: |
           mkdir -p build
           cp ssl-chain-analyzer build/
-          mkdir -p build/assets
-          cp -r assets/web build/assets/
+          mkdir -p build/assets/web
+          cp -r assets/web/* build/assets/web/
           chmod +x packaging/scripts/*.sh
 
       - name: 打包 RPM

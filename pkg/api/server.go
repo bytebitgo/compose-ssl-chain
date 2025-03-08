@@ -50,27 +50,33 @@ func (s *Server) setupRoutes() {
 	s.router.POST("/api/export", s.exportCertificates)
 	s.router.POST("/api/export/file", s.exportFileAnalysis)
 
+	// 静态文件服务的基础路径
+	var staticPath string
+	if _, err := os.Stat("/usr/share/ssl-chain-analyzer/assets/web"); err == nil {
+		staticPath = "/usr/share/ssl-chain-analyzer/assets/web"
+	} else {
+		staticPath = "./assets/web"
+	}
+
 	// 静态文件服务
 	s.router.GET("/assets/*filepath", func(c *gin.Context) {
 		path := c.Param("filepath")
+		filePath := filepath.Join(staticPath, path)
+		
 		if strings.HasSuffix(path, ".js") {
 			c.Header("Content-Type", "application/javascript; charset=utf-8")
-			c.File("./assets/web/assets/" + path)
-			return
 		} else if strings.HasSuffix(path, ".css") {
 			c.Header("Content-Type", "text/css; charset=utf-8")
-			c.File("./assets/web/assets/" + path)
-			return
 		}
-		c.File("./assets/web/assets/" + path)
+		c.File(filePath)
 	})
 
 	// 主页和其他路由
 	s.router.GET("/", func(c *gin.Context) {
-		c.File("./assets/web/index.html")
+		c.File(filepath.Join(staticPath, "index.html"))
 	})
 	s.router.NoRoute(func(c *gin.Context) {
-		c.File("./assets/web/index.html")
+		c.File(filepath.Join(staticPath, "index.html"))
 	})
 }
 
