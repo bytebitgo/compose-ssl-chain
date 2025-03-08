@@ -61,7 +61,7 @@ func (s *Server) setupRoutes() {
 	// 静态文件服务
 	s.router.GET("/assets/*filepath", func(c *gin.Context) {
 		path := c.Param("filepath")
-		filePath := filepath.Join(staticPath, "assets", path)
+		filePath := filepath.Join(staticPath, path)
 		
 		if strings.HasSuffix(path, ".js") {
 			c.Header("Content-Type", "application/javascript; charset=utf-8")
