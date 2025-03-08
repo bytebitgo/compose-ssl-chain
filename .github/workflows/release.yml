@@ -18,15 +18,14 @@ jobs:
     steps:
       - name: 安装基础工具
         run: |
-          yum install -y epel-release
           yum install -y git make gcc rpm-build wget curl tar gzip
 
       - name: 安装 Go
         run: |
           curl -L https://go.dev/dl/go1.21.6.linux-amd64.tar.gz -o go.tar.gz
           tar -C /usr/local -xzf go.tar.gz
-          echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.bashrc
-          source $HOME/.bashrc
+          export PATH=$PATH:/usr/local/go/bin
+          go version
 
       - name: 安装 Node.js
         run: |
@@ -73,6 +72,9 @@ jobs:
         run: |
           export PATH=$PATH:/usr/local/go/bin
           export CGO_ENABLED=0
+          export GOOS=linux
+          export GOARCH=amd64
+          export GOFLAGS="-buildmode=pie"
           chmod +x build.sh
           ./build.sh
 
@@ -90,28 +92,14 @@ jobs:
           nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos7
 
       - name: 打包 CentOS 8 RPM
-        uses: addnab/docker-run-action@v3
-        with:
-          image: centos:8
-          options: -v ${{ github.workspace }}:/work
-          run: |
-            cd /work
-            dnf install -y epel-release
-            dnf install -y rpm-build
-            export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin
-            nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos8
+        run: |
+          export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin
+          nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos8
 
       - name: 打包 CentOS 9 RPM
-        uses: addnab/docker-run-action@v3
-        with:
-          image: centos:9
-          options: -v ${{ github.workspace }}:/work
-          run: |
-            cd /work
-            dnf install -y epel-release
-            dnf install -y rpm-build
-            export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin
-            nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos9
+        run: |
+          export PATH=$PATH:/usr/local/go/bin:$(go env GOPATH)/bin
+          nfpm package --config packaging/nfpm.yaml --target build --packager rpm -p rpm.centos9
 
       - name: 打包 DEB
         run: |
