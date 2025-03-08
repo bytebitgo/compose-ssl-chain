@@ -44,6 +44,23 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: 生成发布说明
+        id: release_notes
+        run: |
+          echo "NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "## 新版本发布 ${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 新增" >> $GITHUB_OUTPUT
+          echo "- 添加 GitHub Actions 自动化构建和发布流程" >> $GITHUB_OUTPUT
+          echo "- 添加 DEB 和 RPM 包的自动构建" >> $GITHUB_OUTPUT
+          echo "- 添加自动更新 CHANGELOG 功能" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 优化" >> $GITHUB_OUTPUT
+          echo "- 优化打包流程，修复目录结构问题" >> $GITHUB_OUTPUT
+          echo "- 改进构建脚本的执行权限管理" >> $GITHUB_OUTPUT
+          echo "- 优化 systemd 服务配置" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: 构建项目
         run: |
           chmod +x build.sh
@@ -68,7 +85,7 @@ jobs:
           name: Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
-          generate_release_notes: true
+          body: ${{ steps.release_notes.outputs.NOTES }}
           files: |
             build/*.deb
             build/*.rpm
@@ -80,7 +97,7 @@ jobs:
         uses: stefanzweifel/changelog-updater-action@v1
         with:
           latest-version: ${{ steps.get_version.outputs.VERSION }}
-          release-notes: ${{ github.event.release.body }}
+          release-notes: ${{ steps.release_notes.outputs.NOTES }}
 
       - name: 提交 CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
